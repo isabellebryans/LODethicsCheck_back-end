@@ -29,7 +29,6 @@ public class DownloadFile {
         // Create temp folder
         // If the ontology is a common benign vocab, ignore
         if (Utils.ArrayContains(common_vocabs, ontURL)){
-
             return false;
         }
         number=number+1;
@@ -38,6 +37,7 @@ public class DownloadFile {
         logger.info("Loading ontology ");
         return true;
     }
+
 
     public static Path createTempFolder(){
         number=0;

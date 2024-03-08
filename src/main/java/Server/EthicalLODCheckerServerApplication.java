@@ -1,13 +1,13 @@
-package ie.tcd.EthicalLODCheckerServer;
+package Server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EthicalLodCheckerServerApplication {
+public class EthicalLODCheckerServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EthicalLodCheckerServerApplication.class, args);
+		SpringApplication.run(EthicalLODCheckerServerApplication.class, args);
 	}
 
 }

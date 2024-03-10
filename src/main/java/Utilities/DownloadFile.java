@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.text.Utilities;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,17 +24,16 @@ public class DownloadFile {
             "http://dbpedia.org/resource/"
     };
 
-    public static boolean downloadOntology(String ontURL, Path tmpFolder) throws IOException {
+    public static void downloadOntology(String ontURL, Path tmpFolder) throws IOException {
         // Create temp folder
         // If the ontology is a common benign vocab, ignore
         if (Utils.ArrayContains(common_vocabs, ontURL)){
-            return false;
+            return;
         }
         number=number+1;
         String ontologyPath = tmpFolder + File.separator + "ontology" + number + ".rdf";
         downloadFile(ontURL, ontologyPath);
         logger.info("Loading ontology ");
-        return true;
     }
 
 
@@ -67,31 +65,27 @@ public class DownloadFile {
 
         URL url = new URL(fileURL+".rdf");
         System.out.println("Trying to download " + url.toString());
-        try {
-            URLConnection conn = url.openConnection();
-            InputStream inputStream = conn.getInputStream();
+        URLConnection conn = url.openConnection();
+        InputStream inputStream = conn.getInputStream();
 
-            try (FileOutputStream outputStream = new FileOutputStream(savePath)) {
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                outputStream.write(firstLine.getBytes());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
+        try (FileOutputStream outputStream = new FileOutputStream(savePath)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            outputStream.write(firstLine.getBytes());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
 
-                // Skip the XML declaration and other processing instructions
-                while ((line = reader.readLine()) != null) {
-                    if (!line.startsWith("<?")) {
-                        outputStream.write(line.getBytes());
-                        outputStream.write(System.lineSeparator().getBytes());
-                    }
+            // Skip the XML declaration and other processing instructions
+            while ((line = reader.readLine()) != null) {
+                if (!line.startsWith("<?")) {
+                    outputStream.write(line.getBytes());
+                    outputStream.write(System.lineSeparator().getBytes());
                 }
-                System.out.println("Downloaded successfully");
-
             }
-        } catch (IOException e) {
-            // Print an error message if download fails
-            System.out.println("Could not download file: " + e.getMessage());
+            System.out.println("Downloaded successfully");
+
         }
+
     }
 
     public static void removeTemporaryFolders(Path tmpFolder){

@@ -1,11 +1,8 @@
 package Checker;
 
-import Utilities.RunOntChecks;
-import org.apache.jena.rdf.model.Literal;
+import Utilities.ExtractMetadata;
+import Utilities.RunEthicalChecks;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.vocabulary.DC_11;
 
 import java.util.Arrays;
 
@@ -15,7 +12,6 @@ public class Ontology {
     // Metadata
     String description=null;
     String title=null;
-    String date=null;
 
     int metaDataScore=0;
 
@@ -38,63 +34,17 @@ public class Ontology {
     }
 
     public void testOntology(){
-        Check1 = RunOntChecks.runCheck1(this);
-        Check2 = RunOntChecks.runCheck2(this);
-        Check3 = RunOntChecks.runCheck3(this);
+        // Test description and title first
+
+        Check1 = RunEthicalChecks.runCheck1(this);
+        Check2 = RunEthicalChecks.runCheck2(this);
+        Check3 = RunEthicalChecks.runCheck3(this);
     }
 
-
-
-    // Check metadata, description etc
-    // Try to find keywords in dc:description where dc=http://purl.org/dc/elements/1.1/
-    // Find the rdfs:labels of properties and classes
-    // If they use rdfs:label, if not, flag
-    //
     private void setMetaData(){
-        String dc = "http://purl.org/dc/elements/1.1/";
-        // Get title:
-        NodeIterator titleIterator = ontModel.listObjectsOfProperty(DC_11.title);
-        NodeIterator descriptionIterator = ontModel.listObjectsOfProperty(DC_11.description);
-        NodeIterator dateIterator = ontModel.listObjectsOfProperty(DC_11.date);
-        if (titleIterator.hasNext()) {
-            RDFNode node = titleIterator.nextNode();
-            if (node.isLiteral()) {
-                Literal literal = node.asLiteral();
-                // Now you can work with the literal
-                System.out.println("Literal value: " + literal.getString());
-                title = literal.getString();
-            } else {
-                // Handle non-literal nodes if needed
-                System.out.println("Object of dc:title is not a Literal");
-            }
-        }
-        if(descriptionIterator.hasNext()){
-            RDFNode node = descriptionIterator.nextNode();
-            if (node.isLiteral()) {
-                Literal literal = node.asLiteral();
-                // Now you can work with the literal
-                System.out.println("Description: " + literal.getString());
-                description = literal.getString();
-            } else {
-                // Handle non-literal nodes if needed
-                System.out.println("Object of dc:description is not a Literal");
-            }
-        }
-
-        if(dateIterator.hasNext()){
-            RDFNode node = dateIterator.nextNode();
-            if (node.isLiteral()) {
-                Literal literal = node.asLiteral();
-                // Now you can work with the literal
-                System.out.println("Date: " + literal.getString());
-                date = literal.getString();
-            } else {
-                // Handle non-literal nodes if needed
-                System.out.println("Object of dc:date is not a Literal");
-            }
-        }
+        title = ExtractMetadata.extractTitle(ontModel);
+        description = ExtractMetadata.extractDescription(ontModel);
     }
-
     public String getDescription(){
         return description;
     }
@@ -105,5 +55,8 @@ public class Ontology {
 
     public Model getOntModel() {
         return ontModel;
+    }
+    public String getUri(){
+        return uri;
     }
 }

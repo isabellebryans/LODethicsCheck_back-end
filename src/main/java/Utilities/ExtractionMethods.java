@@ -1,16 +1,16 @@
 package Utilities;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.DC_11;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// Extract properties from a rdf model
 public class ExtractionMethods {
+
     public static Set<Property> extractProperties(Model model){
         // Collect unique properties
         Set<Property> properties = new HashSet<>();
@@ -36,11 +36,9 @@ public class ExtractionMethods {
             String namespace = extractNamespace(property.getURI());
             namespace_string.add(namespace);
         }
-        System.out.println("Namespaces:");
         for (String ns : namespace_string) {
             Namespace namespace = new Namespace(ns);
             namespaces1.add(namespace);
-            System.out.println(ns);
         }
         return namespaces1;
     }
@@ -61,4 +59,5 @@ public class ExtractionMethods {
         // If '/' or '#' is not found, return the whole URI
         return uri;
     }
+
 }

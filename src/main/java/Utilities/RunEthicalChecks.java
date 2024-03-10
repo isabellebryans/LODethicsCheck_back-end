@@ -6,10 +6,11 @@ import org.apache.jena.rdf.model.Model;
 
 import java.util.ArrayList;
 
-public class RunOntChecks {
+public class RunEthicalChecks {
     static final String[] Check1 = {"child", "criminal", "disab"};
     static final String[] Check2 = {"sex", "gender", "age", "ethnicity", "religion", "nationality"};
     static final String[] Check3 = {"crime", "education", "assault", "income"};
+
 
     public static String[] runCheck1(Ontology o){
 

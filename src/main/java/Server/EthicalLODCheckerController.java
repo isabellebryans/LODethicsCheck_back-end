@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 @CrossOrigin
 @RestController
 public class EthicalLODCheckerController {
@@ -34,35 +36,34 @@ public class EthicalLODCheckerController {
         }
 
         @PostMapping("/upload")
-        public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+        public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+            String response;
             // Process the file
             try {
                 // Create a temporary file in the system's temporary directory
                 Path tempFile = Files.createTempFile(null, file.getOriginalFilename());
-
-                // Transfer the uploaded file to the temporary file
                 file.transferTo(tempFile.toFile());
 
                 // Process the file
                 Model m = LoadModel.initAndLoadModelFromFolder(tempFile.toFile(), Lang.RDFXML);
                 if (m==null){
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get model from file");
-
+                    response = "Failed to get model from file";
                 }
-                Dataset dataset = new Dataset(m);
-                // After processing, if you no longer need the file, consider deleting it
-                Files.delete(tempFile);
-                System.out.println("Here");
-                // Return a success response
-                //return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename() + " at " + tempFile);
-                ResponseEntity<String> res = ResponseEntity.ok().build();
-                System.out.println(res.toString());
-                return ResponseEntity.ok().build();
+                else {
+                    Dataset dataset = new Dataset(m);
+                    // After processing, delete file
+                    Files.delete(tempFile);
+                    System.out.println("Here");
+                    // Return a success response
+                    response = dataset.export_JSON();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                // Return an error response with a 500 Internal Server Error status
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + e.getMessage());
+                // In case of failure, adjust the response accordingly
+                response = "errorMessage: "+ e.getMessage();
+
             }
+            return response;
         }
 
 

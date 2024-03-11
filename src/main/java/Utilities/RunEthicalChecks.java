@@ -12,6 +12,7 @@ public class RunEthicalChecks {
     static final String[] Check3 = {"crime", "education", "assault", "income"};
 
 
+
     public static String[] runCheck1(Ontology o){
 
         return runChecks(o, Check1);
@@ -64,4 +65,5 @@ public class RunEthicalChecks {
 
         return terms_found.toArray(new String[0]);
     }
+
 }

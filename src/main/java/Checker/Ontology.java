@@ -31,6 +31,7 @@ public class Ontology {
         System.out.println("Check 1 contains: "+ Arrays.toString(Check1));
         System.out.println("Check 2 contains: "+ Arrays.toString(Check2));
         System.out.println("Check 3 contains: "+ Arrays.toString(Check3));
+        printMetadata();
     }
 
     public void testOntology(){
@@ -39,6 +40,10 @@ public class Ontology {
         Check1 = RunEthicalChecks.runCheck1(this);
         Check2 = RunEthicalChecks.runCheck2(this);
         Check3 = RunEthicalChecks.runCheck3(this);
+    }
+    private void printMetadata(){
+        System.out.println("Title: "+title);
+        System.out.println("Description: "+description);
     }
 
     private void setMetaData(){

@@ -28,12 +28,18 @@ public class Dataset {
         this.ontologies = LoadModel.loadOntologiesFromFolder(this.ontologiesFolder);
         DownloadFile.removeTemporaryFolders(ontologiesFolder);
         printNamespaces();
+        printMetadata();
     }
     private void printNamespaces(){
         System.out.println("Namespaces: ");
         for(Namespace ns : namespaces){
             System.out.println(ns.getNs()+" "+ns.isDownloadable());
             }
+    }
+
+    private void printMetadata(){
+        System.out.println("Title: "+title);
+        System.out.println("Description: "+description);
     }
     private void setMetaData(){
         title = ExtractMetadata.extractTitle(model);

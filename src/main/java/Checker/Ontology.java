@@ -2,6 +2,7 @@ package Checker;
 
 import Utilities.ExtractMetadata;
 import Utilities.RunEthicalChecks;
+import com.google.gson.Gson;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 
@@ -10,6 +11,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import com.google.gson.*;
 
 public class Ontology {
     Model ontModel;
@@ -76,46 +79,32 @@ public class Ontology {
         System.out.println("Check 3 contains: "+ Arrays.toString(Check3));
     }
 
-    public String get_JSON(){
-        String title, description, ont_checks1, ont_checks2, ont_checks3, foops_score;
-        if (this.title!=null){
-            title = "\"ontology_title\": \""+this.title+"\",\n";
-        }else{
-            title = "\"ontology_title\": \"none\",\n";
+
+    public JsonObject get_JSON() {
+        JsonObject json = new JsonObject();
+        // Directly add properties to the JsonObject
+        json.addProperty("ontology_uri", this.uri);
+        json.addProperty("ontology_title", this.title != null ? this.title : "none");
+        json.addProperty("ontology_description", this.description != null ? this.description : "none");
+        // Add foops_score as a double
+        if (this.foopsResult != null) {
+            json.addProperty("foops_score", this.foopsResult.getOverall_score());
+        } else {
+            // Assuming you still want to indicate 'none' or similar if there's no score.
+            // If not having a score should simply omit the property, you can adjust this logic.
+            json.addProperty("foops_score", "none");
         }
-        if (this.description!=null){
-            description = "\"ontology_description\": \""+this.description+"\",\n";
-        }else{
-            description = "\"ontology_description\": \"none\",\n";
-        }
-        if(this.foopsResult !=null){
-            foops_score = "\"foops_score\": \""+this.foopsResult.getOverall_score()+"\",\n";
-        }else{
-            foops_score = "\"foops_score\": \"none\",\n";
-        }
-        if (this.Check1!=null){
-            ont_checks1= "\"ontology_checks1\": \""+ Arrays.toString(this.Check1) +"\",\n";
-        }else{
-            ont_checks1="\"ontology_checks1\": \"none\",\n";
-        }
-        if (this.Check2!=null){
-            ont_checks2= "\"ontology_checks2\": \""+ Arrays.toString(this.Check2) +"\",\n";
-        }else{
-            ont_checks2="\"ontology_checks2\": \"none\",\n";
-        }
-        if (this.Check3!=null){
-            ont_checks3= "\"ontology_checks3\": \""+ Arrays.toString(this.Check3) +"\"\n";
-        }else{
-            ont_checks3="\"ontology_checks3\": \"none\"\n";
-        }
-        String out = "{\n\"ontology_uri\": \""+ this.uri +"\",\n " +
-                title +
-                description +
-                foops_score +
-                ont_checks1 +
-                ont_checks2 +
-                ont_checks3 + "}\n";
-        return out;
+        // Assuming Check1, Check2, Check3 are arrays or collections of strings
+        // Convert them directly to JsonArrays using Gson's toJsonTree method
+        // This assumes Check1, Check2, Check3, etc. are String[] or similar;
+        // if they're not, you'll need to adjust this accordingly.
+        json.add("ontology_checks1", this.getCheck1() != null ? new Gson().toJsonTree(this.getCheck1()) : new JsonArray());
+        json.add("ontology_checks2", this.getCheck2() != null ? new Gson().toJsonTree(this.getCheck2()) : new JsonArray());
+        json.add("ontology_checks3", this.getCheck3() != null ? new Gson().toJsonTree(this.getCheck3()) : new JsonArray());
+
+
+        // Serialize the JsonObject to a JSON string
+        return json;
     }
 
     private void printMetadata(){

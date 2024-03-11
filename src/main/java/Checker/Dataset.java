@@ -3,6 +3,8 @@ package Checker;
 import Utilities.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.apache.jena.base.Sys;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -65,62 +67,30 @@ public class Dataset {
     }
 
     public String export_JSON(){
-        String title, description, ds_checks1, ds_checks2, ds_checks3, ds_namespaces, ds_unav_ns;
-        if (this.ont.getTitle()!=null){
-            title = "\"dataset_title\": \""+this.ont.getTitle()+"\",\n";
-        }else{
-            title = "\"dataset_title\": \"none\",\n";
-        }
-        if (this.ont.getDescription()!=null){
-            description = "\"dataset_description\": \""+this.ont.getDescription()+"\",\n";
-        }else{
-            description = "\"dataset_description\": \"none\",\n";
-        }
-        if (this.ont.getCheck1()!=null){
-            ds_checks1= "\"dataset_checks1\": \""+ Arrays.toString(this.ont.getCheck1()) +"\",\n";
-        }else{
-            ds_checks1="\"dataset_checks1\": \"none\",\n";
-        }
-        if (this.ont.getCheck2()!=null){
-            ds_checks2= "\"dataset_checks2\": \""+ Arrays.toString(this.ont.getCheck2()) +"\",\n";
-        }else{
-            ds_checks2="\"dataset_checks2\": \"none\",\n";
-        }
-        if (this.ont.getCheck3()!=null){
-            ds_checks3= "\"dataset_checks3\": \""+ Arrays.toString(this.ont.getCheck3()) +"\",\n";
-        }else{
-            ds_checks3="\"dataset_checks3\": \"none\",\n";
-        }
-        if (this.getNamespaceStrings()!=null){
-            ds_namespaces= "\"dataset_namespaces\": \""+ Arrays.toString(this.getNamespaceStrings()) +"\",\n";
-        }else{
-            ds_namespaces="\"dataset_namespaces\": \"none\",\n";
-        }
-        if (this.undownloadableNamespaces()!=null){
-            ds_unav_ns= "\"dataset_unavailable_namespaces\": \""+ Arrays.toString(this.undownloadableNamespaces()) +"\",\n";
-        }else{
-            ds_unav_ns="\"dataset_unavailable_namespaces\": \"none\",\n";
-        }
-        String out = "{\n " +
-                title +
-                description +
+        JsonObject json = new JsonObject();
 
-                ds_checks1 +
-                ds_checks2 +
-                ds_checks3 +
-                ds_namespaces+
-                ds_unav_ns+
-                "\"ontologies_tested\":[";
-        int i=0;
-        for (Ontology o : this.ontologies){
-            if (i>0){
-                out+= ",";
-            }
-            out+= o.get_JSON();
-            i+=1;
+        json.addProperty("dataset_title", this.ont.getTitle() != null ? this.ont.getTitle() : "none");
+        json.addProperty("dataset_description", this.ont.getDescription() != null ? this.ont.getDescription() : "none");
+
+        // Convert arrays directly to JsonArray, assuming getCheck1(), etc., return String[] or Collection<String>
+        json.add("dataset_checks1", this.ont.getCheck1() != null ? new Gson().toJsonTree(this.ont.getCheck1()) : new JsonArray());
+        json.add("dataset_checks2", this.ont.getCheck2() != null ? new Gson().toJsonTree(this.ont.getCheck2()) : new JsonArray());
+        json.add("dataset_checks3", this.ont.getCheck3() != null ? new Gson().toJsonTree(this.ont.getCheck3()) : new JsonArray());
+        json.add("dataset_namespaces", this.getNamespaceStrings() != null ? new Gson().toJsonTree(this.getNamespaceStrings()) : new JsonArray());
+        json.add("dataset_unavailable_namespaces", this.undownloadableNamespaces() != null ? new Gson().toJsonTree(this.undownloadableNamespaces()) : new JsonArray());
+
+        // For ontologies_tested, assuming each Ontology object has a method to convert itself to a JsonObject
+        JsonArray ontologiesTested = new JsonArray();
+        for (Ontology o : this.ontologies) {
+            // Here, it's assumed Ontology has a method to return its representation as a JsonObject.
+            // If not, you would construct this JsonObject similarly to above.
+            ontologiesTested.add(o.get_JSON());
         }
-        out += "\n]}";
-        return out;
+        json.add("ontologies_tested", ontologiesTested);
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(json);
+        System.out.println(jsonString);
+        return jsonString;
     }
 
 

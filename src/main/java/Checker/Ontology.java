@@ -73,7 +73,22 @@ public class Ontology {
         Check2 = stringSet2.toArray(new String[0]);
         Check3 = stringSet3.toArray(new String[0]);
 
-        System.out.println("Ran extra tests on dataset: ");
+        System.out.println("Ran level 3 property tests on dataset: ");
+        System.out.println("Check 1 contains: "+ Arrays.toString(Check1));
+        System.out.println("Check 2 contains: "+ Arrays.toString(Check2));
+        System.out.println("Check 3 contains: "+ Arrays.toString(Check3));
+    }
+    public void level4_testObjects(){
+        Set<String> stringSet1 = new HashSet<>(Arrays.asList(Check1));
+        Set<String> stringSet3 = new HashSet<>(Arrays.asList(Check3));
+
+        stringSet1.addAll(Arrays.asList(RunEthicalChecks.level4_check1(ontModel)));
+        stringSet3.addAll(Arrays.asList(RunEthicalChecks.level4_check3(ontModel)));
+
+        Check1 = stringSet1.toArray(new String[0]);
+        Check3 = stringSet3.toArray(new String[0]);
+
+        System.out.println("Ran level 4 object tests on dataset: ");
         System.out.println("Check 1 contains: "+ Arrays.toString(Check1));
         System.out.println("Check 2 contains: "+ Arrays.toString(Check2));
         System.out.println("Check 3 contains: "+ Arrays.toString(Check3));

@@ -30,7 +30,7 @@ public class EthicalLODCheckerController {
                 return "Can't load model from resource";
             }
             //return "Can load model";
-            Dataset dataSet = new Dataset(model1);
+           // Dataset dataSet = new Dataset(model1);
 
             return "Done";
         }
@@ -43,14 +43,13 @@ public class EthicalLODCheckerController {
                 // Create a temporary file in the system's temporary directory
                 Path tempFile = Files.createTempFile(null, file.getOriginalFilename());
                 file.transferTo(tempFile.toFile());
-
                 // Process the file
                 Model m = LoadModel.initAndLoadModelFromFolder(tempFile.toFile(), Lang.RDFXML);
                 if (m==null){
                     response = "Failed to get model from file";
                 }
                 else {
-                    Dataset dataset = new Dataset(m);
+                    Dataset dataset = new Dataset(m, file.getOriginalFilename());
                     // After processing, delete file
                     Files.delete(tempFile);
                     System.out.println("Here");

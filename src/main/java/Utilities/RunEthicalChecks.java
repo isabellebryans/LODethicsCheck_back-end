@@ -10,9 +10,17 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class RunEthicalChecks {
-    static final String[] Check1 = {"child", "criminal", "disab", "latitude"};
-    static final String[] Check2 = {"sex", "gender", "age", "ethnic","post",  "religion", "nationality"};
-    static final String[] Check3 = {"crime", "educat", "assault", "income", "unemploy"};
+    static final String[] Check1 = {"child", "minor", "youth", "school",
+            "homeless", "elderly", "senior", "retire",
+            "migrant", "refugee", "asylum seeker", "immigrant",
+            "criminal", "disab", "impair", "disadvantaged"};
+    static final String[] Check2 = {"sex", "gender", "age", "ethnic", "race", "religion", "nationality"};
+    static final String[] Check3 = {"medical", "health", "psychiatric", "addiction", "treatment", "disease", "disorder",
+            "income", "debt", "credit", "poverty", "wealth", "salary","unemploy",
+            "crime", "convict", "arrest", "incarcerat", "legal status","assault",
+            "sexual orientation", "lgbt", "transgender",
+            "political", "voting", "party affiliation", "activism",
+            "educat"};
 
 
     // Level 1 and 2 checks
@@ -27,18 +35,18 @@ public class RunEthicalChecks {
         return runChecks(o, Check3);
     }
 
-    private static String[] runChecks(Ontology o, String[] words){
+    private static String[] runChecks(Ontology o, String[] terms){
         Model m = o.getOntModel();
         ArrayList<String> terms_found = new ArrayList<>();
-        for (String word : words) {
+        for (String term : terms) {
             // Check title
-            if (o.getTitle()!=null && o.getTitle().contains(word)){
-                terms_found.add(word);
+            if (o.getTitle()!=null && o.getTitle().contains(term)){
+                terms_found.add(term);
                 continue;
             }
             // Check description
-            if (o.getDescription()!=null && o.getDescription().contains(word)){
-                terms_found.add(word);
+            if (o.getDescription()!=null && o.getDescription().contains(term)){
+                terms_found.add(term);
                 continue;
             }
             // Check rdfs:labels in model
@@ -46,14 +54,14 @@ public class RunEthicalChecks {
                     "SELECT * " +
                     "WHERE{" +
                     "?s rdfs:label ?o." +
-                    "FILTER (CONTAINS(?o, \""+ word + "\") )" +
+                    "FILTER (CONTAINS(lcase(?o), \""+ term + "\") )" +
                     "}";
             Query q = QueryFactory.create(query_string);
             QueryExecution qexec = QueryExecutionFactory.create(q, m);
             try{
                 ResultSet results = qexec.execSelect();
                 while (results.hasNext()){
-                    terms_found.add(word);
+                    terms_found.add(term);
                     break;
                 }
             } finally {
@@ -74,46 +82,52 @@ public class RunEthicalChecks {
         return test_properties(m, properties, Check3);
     }
 
-    private static String[] test_properties(Model m, Set<Property> properties, String[] words){
+    private static String[] test_properties(Model m, Set<Property> properties, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
-        for (String word : words){
+        for (String term : terms){
             for(Property p : properties){
                 String p_string = p.getLocalName();
-                System.out.println("Testing "+ p_string +" for "+word);
-                if (p_string.contains(word)){
-                    terms_found.add(word);
+                System.out.println("Testing "+ p_string +" for "+term);
+                if (p_string.contains(term)){
+                    terms_found.add(term);
                     break;
                 }
             }
         }
         return terms_found.toArray(new String[0]);
     }
-    private static String[] test_properties1(Model m, String[] words){
+
+    public static String[] level4_check1(Model m){
+        return test_all_objects(m, Check1);
+    }
+    public static String[] level4_check2(Model m){
+        return test_all_objects(m, Check2);
+    }
+    public static String[] level4_check3(Model m){
+        return test_all_objects(m, Check3);
+    }
+    private static String[] test_all_objects(Model m, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
-        for (String word : words) {
-            System.out.println("Testing for "+ word +" in predicates");
-            // Check predicates in model
+        for(String term : terms){
             String query_string =
-                    "SELECT ?p " +
+                    "SELECT * " +
                     "WHERE{" +
                     "?s ?p ?o." +
-                    "FILTER (CONTAINS(?p, \""+ word + "\") )" +
+                    "FILTER (CONTAINS(lcase(?o), \""+ term + "\") )" +
                     "}";
-            System.out.println(query_string);
             Query q = QueryFactory.create(query_string);
-            try (QueryExecution qexec = QueryExecutionFactory.create(q, m)) {
+            QueryExecution qexec = QueryExecutionFactory.create(q, m);
+            try{
                 ResultSet results = qexec.execSelect();
-                while (results.hasNext()) {
-                    System.out.println(results.nextSolution().getResource("p").getURI());
-                    terms_found.add(word);
-                    System.out.println("Found: "+word);
-
+                while (results.hasNext()){
+                    terms_found.add(term);
+                    break;
                 }
+            } finally {
+                qexec.close();
             }
-
         }
         return terms_found.toArray(new String[0]);
     }
-
 
 }

@@ -14,7 +14,7 @@ class DatasetTest {
 
     @Test
     void Dataset_test() throws IOException {
-        Dataset ds = new Dataset(m);
+        Dataset ds = new Dataset(m, "hey");
         System.out.println(ds.export_JSON());
     }
     DatasetTest() throws IOException {

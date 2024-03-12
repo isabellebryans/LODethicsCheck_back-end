@@ -22,9 +22,11 @@ public class Dataset {
     private Set<Property> properties;
     private final List<Namespace> namespaces;
     private final Ontology[] ontologies;
+    private final String fileName;
 
 
-    public Dataset(Model model1) throws IOException {
+    public Dataset(Model model1, String fileName) throws IOException {
+        this.fileName = fileName;
         this.ont = new Ontology(model1, "");
         this.ont.runTests();
         this.properties = ExtractionMethods.extractProperties(model1);
@@ -47,16 +49,22 @@ public class Dataset {
 
     // See if all ontologies are downloadable.
     public void level3_testDataset(){
+        boolean downloadable=true;
         for(Namespace ns : namespaces){
             System.out.println(ns.getNs()+" "+ns.isDownloadable());
             if (!ns.isDownloadable()){
                 ontsUnavailable.add(ns);
+                downloadable=false;
             }
         }
         if (ont.getTitle() == null && ont.getDescription() == null){
             // Go to test 3
             ont.level3_testProperties(this.properties);
+            ont.level4_testObjects();
         }
+//        if (!downloadable || this.ontologies.length==0 || (ont.getTitle() == null && ont.getDescription() == null)){
+//
+//        }
     }
 
     private void printNamespaces(){
@@ -68,7 +76,7 @@ public class Dataset {
 
     public String export_JSON(){
         JsonObject json = new JsonObject();
-
+        json.addProperty("file_name", this.fileName);
         json.addProperty("dataset_title", this.ont.getTitle() != null ? this.ont.getTitle() : "none");
         json.addProperty("dataset_description", this.ont.getDescription() != null ? this.ont.getDescription() : "none");
 
@@ -119,6 +127,7 @@ public class Dataset {
     public Ontology getOnt() {
         return ont;
     }
+    public String getFileName(){ return fileName; }
 
     public List<Namespace> getNamespaces() {
         return namespaces;

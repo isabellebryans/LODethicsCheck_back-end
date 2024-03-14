@@ -19,6 +19,7 @@ public class Foops {
     private String ontology_title;
     private double overall_score;
     private List<FoopsCheck> checks;
+    private JSONObject results;
 
     public Foops(String uri) throws IOException {
         this.URI = uri;
@@ -62,6 +63,7 @@ public class Foops {
 
     private void set_results(String json){
         JSONObject jsonObject = new JSONObject(json);
+        this.results = jsonObject;
         this.ontology_title = jsonObject.getString("ontology_title");
         this.overall_score = jsonObject.getDouble("overall_score");
         // Parsing checks array

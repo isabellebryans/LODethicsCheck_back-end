@@ -29,11 +29,42 @@ public class ExtractionMethods {
         return properties;
     }
 
-    public static List<Namespace> extractNamespaces(Set<Property> properties){
+    public static Set<Resource> extractObjects(Model model){
+        // Collect unique properties
+        Set<Resource> objects = new HashSet<>();
+        StmtIterator iter = model.listStatements();
+        while (iter.hasNext()) {
+            Statement stmt = iter.nextStatement();
+            RDFNode objct = stmt.getObject();
+            if (!objct.isLiteral()){
+                // Make sure not literal OR blank node
+                if(objct.asResource().getURI()!=null){
+                    objects.add(objct.asResource());
+                }
+            }
+
+        }
+
+        // Print the unique properties
+        System.out.println("Unique Object Resources:");
+        for (Resource resource : objects) {
+            System.out.println(resource.getURI());
+        }
+        return objects;
+    }
+
+
+
+    public static List<Namespace> extractNamespaces(Set<Property> properties, Model model){
+        Set<Resource> resources = extractObjects(model);
         Set<String> namespace_string = new HashSet<>();
         ArrayList<Namespace> namespaces1 = new ArrayList<>();
         for (Property property : properties) {
             String namespace = extractNamespace(property.getURI());
+            namespace_string.add(namespace);
+        }
+        for (Resource r : resources){
+            String namespace = extractNamespace(r.getURI());
             namespace_string.add(namespace);
         }
         for (String ns : namespace_string) {

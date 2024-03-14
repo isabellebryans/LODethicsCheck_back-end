@@ -3,8 +3,7 @@ package Utilities;
 import Checker.Ontology;
 import org.apache.jena.base.Sys;
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.*;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -19,7 +18,7 @@ public class RunEthicalChecks {
             "income", "debt", "credit", "poverty", "wealth", "salary","unemploy",
             "crime", "convict", "arrest", "incarcerat", "legal status","assault",
             "sexual orientation", "lgbt", "transgender",
-            "political", "voting", "party affiliation", "activism",
+            "political", "voting", "affiliation", "activism",
             "educat"};
 
 
@@ -87,7 +86,7 @@ public class RunEthicalChecks {
         for (String term : terms){
             for(Property p : properties){
                 String p_string = p.getLocalName();
-                System.out.println("Testing "+ p_string +" for "+term);
+               // System.out.println("Testing "+ p_string +" for "+term);
                 if (p_string.contains(term)){
                     terms_found.add(term);
                     break;
@@ -108,26 +107,50 @@ public class RunEthicalChecks {
     }
     private static String[] test_all_objects(Model m, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
-        for(String term : terms){
-            String query_string =
-                    "SELECT * " +
-                    "WHERE{" +
-                    "?s ?p ?o." +
-                    "FILTER (CONTAINS(lcase(?o), \""+ term + "\") )" +
-                    "}";
-            Query q = QueryFactory.create(query_string);
-            QueryExecution qexec = QueryExecutionFactory.create(q, m);
-            try{
-                ResultSet results = qexec.execSelect();
-                while (results.hasNext()){
-                    terms_found.add(term);
-                    break;
+        for(String term:terms){
+            StmtIterator it = m.listStatements();
+            while(it.hasNext()){
+                RDFNode object = it.nextStatement().getObject();
+
+                if (object.isLiteral()){
+                   // System.out.println("Testing literal: "+object.asLiteral().getString()+" for term: "+term);
+                    if(object.asLiteral().getString().contains(term)){
+                        terms_found.add(term);
+                        break;
+                    }
+                } else if (!object.asNode().isBlank()){
+                  //  System.out.println("Testing resource: "+object.asResource().getURI()+" for term: "+term);
+                    if (object.asResource().getLocalName().contains(term)){
+                        terms_found.add(term);
+                        break;
+                    }
                 }
-            } finally {
-                qexec.close();
             }
         }
         return terms_found.toArray(new String[0]);
     }
+//    private static String[] test_all_objects1(Model m, String[] terms){
+//        ArrayList<String> terms_found = new ArrayList<>();
+//        for(String term : terms){
+//            String query_string =
+//                    "SELECT * " +
+//                    "WHERE{" +
+//                    "?s ?p ?o." +
+//                    "FILTER (CONTAINS(lcase(?o), \""+ term + "\") )" +
+//                    "}";
+//            Query q = QueryFactory.create(query_string);
+//            QueryExecution qexec = QueryExecutionFactory.create(q, m);
+//            try{
+//                ResultSet results = qexec.execSelect();
+//                while (results.hasNext()){
+//                    terms_found.add(term);
+//                    break;
+//                }
+//            } finally {
+//                qexec.close();
+//            }
+//        }
+//        return terms_found.toArray(new String[0]);
+//    }
 
 }

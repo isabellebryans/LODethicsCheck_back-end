@@ -30,13 +30,14 @@ public class Dataset {
         this.ont = new Ontology(model1, "");
         this.ont.runTests();
         this.properties = ExtractionMethods.extractProperties(model1);
-        this.namespaces = ExtractionMethods.extractNamespaces(properties);
+        this.namespaces = ExtractionMethods.extractNamespaces(properties, model1);
         Path ontologiesFolder = downloadOntologies();
         this.ontologies = LoadModel.loadOntologiesFromFolder(ontologiesFolder);
         DownloadFile.removeTemporaryFolders(ontologiesFolder);
         printNamespaces();
         level3_testDataset();
         testOntologies();
+        link_Namespace_Ontology();
     }
 
     private void testOntologies(){
@@ -117,7 +118,20 @@ public class Dataset {
     }
 
     // Getters and setters
-
+    private void link_Namespace_Ontology(){
+        for (Ontology ontology : ontologies){
+            String ont_uri = ontology.getUri();
+            String ont_uri_sub = ont_uri.substring(5);
+           for(Namespace ns :namespaces){
+               String ns_string = ns.getNs();
+                if(ns_string.contains(ont_uri_sub)){
+                    // Link ontology to namespace
+                    ns.setOntology(ontology);
+                    break;
+                }
+           }
+        }
+    }
 
 
     public Ontology[] getOntologies() {

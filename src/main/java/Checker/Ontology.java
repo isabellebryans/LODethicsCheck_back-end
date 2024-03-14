@@ -98,17 +98,10 @@ public class Ontology {
     public JsonObject get_JSON() {
         JsonObject json = new JsonObject();
         // Directly add properties to the JsonObject
-        json.addProperty("ontology_uri", this.uri);
+        //json.addProperty("ontology_uri", this.uri);
         json.addProperty("ontology_title", this.title != null ? this.title : "none");
         json.addProperty("ontology_description", this.description != null ? this.description : "none");
-        // Add foops_score as a double
-        if (this.foopsResult != null) {
-            json.addProperty("foops_score", this.foopsResult.getOverall_score());
-        } else {
-            // Assuming you still want to indicate 'none' or similar if there's no score.
-            // If not having a score should simply omit the property, you can adjust this logic.
-            json.addProperty("foops_score", "none");
-        }
+
         // Assuming Check1, Check2, Check3 are arrays or collections of strings
         // Convert them directly to JsonArrays using Gson's toJsonTree method
         // This assumes Check1, Check2, Check3, etc. are String[] or similar;

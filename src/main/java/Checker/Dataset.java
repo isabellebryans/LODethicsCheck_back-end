@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import org.apache.jena.base.Sys;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdfxml.xmlinput.impl.Names;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -89,13 +90,13 @@ public class Dataset {
         json.add("dataset_unavailable_namespaces", this.undownloadableNamespaces() != null ? new Gson().toJsonTree(this.undownloadableNamespaces()) : new JsonArray());
 
         // For ontologies_tested, assuming each Ontology object has a method to convert itself to a JsonObject
-        JsonArray ontologiesTested = new JsonArray();
-        for (Ontology o : this.ontologies) {
+        JsonArray namespacesTested = new JsonArray();
+        for (Namespace ns : this.namespaces) {
             // Here, it's assumed Ontology has a method to return its representation as a JsonObject.
             // If not, you would construct this JsonObject similarly to above.
-            ontologiesTested.add(o.get_JSON());
+            namespacesTested.add(ns.getJSON());
         }
-        json.add("ontologies_tested", ontologiesTested);
+        json.add("namespaces_tested", namespacesTested);
         Gson gson = new Gson();
         String jsonString = gson.toJson(json);
         System.out.println(jsonString);

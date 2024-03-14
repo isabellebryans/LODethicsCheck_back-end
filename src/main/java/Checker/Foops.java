@@ -1,5 +1,6 @@
 package Checker;
 
+import com.google.gson.JsonElement;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import Utilities.FoopsCheck;
@@ -99,4 +100,8 @@ public class Foops {
         return checks;
     }
 
+    public JSONObject getResults() {
+
+        return results;
+    }
 }

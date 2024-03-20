@@ -1,4 +1,4 @@
-package Utilities;
+package Checker;
 
 import Checker.Foops;
 import Checker.Ontology;
@@ -14,6 +14,7 @@ public class Namespace {
     String ns;
     private Ontology ontology= null;
     boolean downloadable=false;
+    private String model_loaded = "false";
     private Foops foops;
 
 
@@ -47,12 +48,13 @@ public class Namespace {
         JsonObject json = new JsonObject();
         json.addProperty("ns_uri", this.ns);
         json.addProperty("ns_downloadable", this.downloadable);
+        json.addProperty("ns_model_loaded", this.model_loaded);
         // Convert the JSONObject to a String
         if (this.foops != null) {
             json.addProperty("ns_foops_overall_score", this.foops.getOverall_score());
-            String resultsString = this.foops.getResults().toString();
-            JsonObject convertedJsonObject = JsonParser.parseString(resultsString).getAsJsonObject();
-            json.add("ns_foops_results", convertedJsonObject);
+//            String resultsString = this.foops.getResults().toString();
+//            JsonObject convertedJsonObject = JsonParser.parseString(resultsString).getAsJsonObject();
+//            json.add("ns_foops_results", convertedJsonObject);
         } else {
             // Assuming you still want to indicate 'none' or similar if there's no score.
             // If not having a score should simply omit the property, you can adjust this logic.
@@ -66,6 +68,14 @@ public class Namespace {
 
     public Ontology getOntology() {
         return ontology;
+    }
+
+    public void setModel_loaded(String model_loaded) {
+        this.model_loaded = model_loaded;
+    }
+
+    public String getModel_loaded() {
+        return model_loaded;
     }
 
     public void setDownloadable(boolean downloadable) {

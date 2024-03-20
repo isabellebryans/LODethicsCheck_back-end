@@ -13,7 +13,7 @@ import java.nio.file.Path;
 public class DownloadFile {
     private static int number;
     private static final Logger logger = LoggerFactory.getLogger(DownloadFile.class);
-    private static final String[] common_vocabs ={
+    public static final String[] common_vocabs ={
             "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "http://www.w3.org/2000/01/rdf-schema#",
             "http://www.w3.org/2002/07/owl#",
@@ -27,9 +27,6 @@ public class DownloadFile {
     public static void downloadOntology(String ontURL, Path tmpFolder) throws IOException {
         // Create temp folder
         // If the ontology is a common benign vocab, ignore
-        if (Utils.ArrayContains(common_vocabs, ontURL)){
-            return;
-        }
         number=number+1;
         String ontologyPath = tmpFolder + File.separator + "ontology" + number + ".rdf";
         downloadFile(ontURL, ontologyPath);

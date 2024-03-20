@@ -2,19 +2,16 @@ package Checker;
 
 import Utilities.*;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.apache.jena.base.Sys;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdfxml.xmlinput.impl.Names;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class Dataset {
@@ -52,13 +49,6 @@ public class Dataset {
     // See if all ontologies are downloadable.
     public void level3_testDataset(){
         boolean downloadable=true;
-        for(Namespace ns : namespaces){
-            System.out.println(ns.getNs()+" "+ns.isDownloadable());
-            if (!ns.isDownloadable()){
-                ontsUnavailable.add(ns);
-                downloadable=false;
-            }
-        }
         if (ont.getTitle() == null && ont.getDescription() == null){
             // Go to test 3
             ont.level3_testProperties(this.properties);
@@ -108,6 +98,11 @@ public class Dataset {
         Path folder = DownloadFile.createTempFolder();
         System.out.println("Temp folder created is "+folder.toString());
         for (Namespace namespace : namespaces){
+            if (Utils.ArrayContains(DownloadFile.common_vocabs, namespace.getNs())){
+                namespace.setDownloadable(true);
+                namespace.setModel_loaded("standard");
+                continue;
+            }
             try {
                 DownloadFile.downloadOntology(namespace.getNs(), folder);
                 namespace.setDownloadable(true);
@@ -128,6 +123,7 @@ public class Dataset {
                 if(ns_string.contains(ont_uri_sub)){
                     // Link ontology to namespace
                     ns.setOntology(ontology);
+                    ns.setModel_loaded("true");
                     break;
                 }
            }
@@ -157,12 +153,15 @@ public class Dataset {
 
     public String[] undownloadableNamespaces(){
         ArrayList<String> namespaceStrings = new ArrayList<>();
-        if (ontsUnavailable==null){
+        for (Namespace ns : this.namespaces){
+            if (Objects.equals(ns.getModel_loaded(), "false")){
+                namespaceStrings.add(ns.getNs());
+            }
+        }
+        String[] new_array = namespaceStrings.toArray(new String[0]);
+        if (new_array.length == 0){
             return null;
         }
-        for (Namespace ns : ontsUnavailable){
-            namespaceStrings.add(ns.getNs());
-        }
-        return namespaceStrings.toArray(new String[0]);
+        return new_array;
     }
 }

@@ -1,7 +1,7 @@
 package Utilities;
 
+import Checker.Namespace;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.DC_11;
 
 import java.util.ArrayList;
 import java.util.HashSet;

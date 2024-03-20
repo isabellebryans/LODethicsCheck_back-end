@@ -13,7 +13,7 @@ public class RunEthicalChecks {
             "homeless", "elderly", "senior", "retire",
             "migrant", "refugee", "asylum seeker", "immigrant",
             "criminal", "disab", "impair", "disadvantaged"};
-    static final String[] Check2 = {"sex", "gender", "age", "ethnic", "race", "religion", "nationality"};
+    static final String[] Check2 = {"sex", "gender", "age", "ethnic", "race", "religion", "nationality", "sexual orientation"};
     static final String[] Check3 = {"medical", "health", "psychiatric", "addiction", "treatment", "disease", "disorder",
             "income", "debt", "credit", "poverty", "wealth", "salary","unemploy",
             "crime", "convict", "arrest", "incarcerat", "legal status","assault",

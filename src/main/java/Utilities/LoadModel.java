@@ -1,6 +1,6 @@
 package Utilities;
 
-import Checker.Ontology;
+import Checker.RDFmodel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoadModel {
-    public static Ontology[] loadOntologiesFromFolder(Path folder) throws IOException {
+    public static RDFmodel[] loadOntologiesFromFolder(Path folder) throws IOException {
         // Create a File object for the temporary folder
         File tempFolder = new File(folder.toString());
-        List<Ontology> onts = new ArrayList<>();
+        List<RDFmodel> onts = new ArrayList<>();
         // Check if the folder exists
         if (tempFolder.exists() && tempFolder.isDirectory()) {
             // List all files in the folder
@@ -34,9 +34,9 @@ public class LoadModel {
                         Model m = LoadModel.initAndLoadModelFromFolder(file, Lang.RDFXML);
                         if (m != null){
                             // System.out.println(m);
-                            Ontology ontology = new Ontology(m, uri);
+                            RDFmodel RDFmodel = new RDFmodel(m, uri);
                             // ADD ONTOLOGY TO ONTOLOGIES ARRAY HERE
-                            onts.add(ontology);
+                            onts.add(RDFmodel);
                         }
                     } catch (IOException e) {
                         System.out.println("Couldn't get model from file");
@@ -47,7 +47,7 @@ public class LoadModel {
             System.out.println("Temporary folder does not exist or is not a directory.");
             return null;
         }
-        return onts.toArray(new Ontology[0]);
+        return onts.toArray(new RDFmodel[0]);
     }
 
     private static String getURIfromFile(File file) throws IOException{

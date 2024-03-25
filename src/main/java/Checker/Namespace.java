@@ -1,18 +1,12 @@
 package Checker;
 
-import Checker.Foops;
-import Checker.Ontology;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import netscape.javascript.JSObject;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
 public class Namespace {
     String ns;
-    private Ontology ontology= null;
+    private RDFmodel RDFmodel = null;
     boolean downloadable=false;
     private String model_loaded = "false";
     private Foops foops;
@@ -36,8 +30,8 @@ public class Namespace {
         return downloadable;
     }
 
-    public void setOntology(Ontology ontology) {
-        this.ontology = ontology;
+    public void setOntology(RDFmodel RDFmodel) {
+        this.RDFmodel = RDFmodel;
     }
 
     public Foops getFoops() {
@@ -60,14 +54,14 @@ public class Namespace {
             // If not having a score should simply omit the property, you can adjust this logic.
             json.addProperty("ns_foops_results", "none");
         }
-        if (this.ontology != null) {
-            json.add("ns_ontology", this.ontology.get_JSON());
+        if (this.RDFmodel != null) {
+            json.add("ns_ontology", this.RDFmodel.get_ont_JSON());
         }
         return json;
     }
 
-    public Ontology getOntology() {
-        return ontology;
+    public RDFmodel getOntology() {
+        return RDFmodel;
     }
 
     public void setModel_loaded(String model_loaded) {

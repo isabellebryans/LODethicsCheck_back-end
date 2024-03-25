@@ -16,47 +16,37 @@ import java.util.Set;
 
 public class Dataset {
     private List<Namespace> ontsUnavailable= new ArrayList<>();
-    private final Ontology ont;
+    private final RDFmodel rdFmodel;
     private Set<Property> properties;
     private final List<Namespace> namespaces;
-    private final Ontology[] ontologies;
+    private final RDFmodel[] ontologies;
     private final String fileName;
+    private final Test[] tests;
 
 
-    public Dataset(Model model1, String fileName) throws IOException {
+    public Dataset(Model model1, String fileName, Test[] tests) throws IOException {
         this.fileName = fileName;
-        this.ont = new Ontology(model1, "");
-        this.ont.runTests();
+        this.tests = tests;
+        this.rdFmodel = new RDFmodel(model1, "");
+        this.rdFmodel.setTests(tests);
         this.properties = ExtractionMethods.extractProperties(model1);
+        this.rdFmodel.runTestsDataset(this.properties);
         this.namespaces = ExtractionMethods.extractNamespaces(properties, model1);
         Path ontologiesFolder = downloadOntologies();
         this.ontologies = LoadModel.loadOntologiesFromFolder(ontologiesFolder);
         DownloadFile.removeTemporaryFolders(ontologiesFolder);
         printNamespaces();
-        level3_testDataset();
         testOntologies();
         link_Namespace_Ontology();
     }
 
     private void testOntologies(){
-        for (Ontology o : this.ontologies){
+        for (RDFmodel o : this.ontologies){
+            o.setTests(this.tests);
         // runn foops
             o.runFOOPS();
-            o.runTests();
+            o.runTestsOntology();
         }
-    }
-
-    // See if all ontologies are downloadable.
-    public void level3_testDataset(){
-        boolean downloadable=true;
-        if (ont.getTitle() == null && ont.getDescription() == null){
-            // Go to test 3
-            ont.level3_testProperties(this.properties);
-            ont.level4_testObjects();
-        }
-//        if (!downloadable || this.ontologies.length==0 || (ont.getTitle() == null && ont.getDescription() == null)){
-//
-//        }
     }
 
     private void printNamespaces(){
@@ -69,16 +59,17 @@ public class Dataset {
     public String export_JSON(){
         JsonObject json = new JsonObject();
         json.addProperty("file_name", this.fileName);
-        json.addProperty("dataset_title", this.ont.getTitle() != null ? this.ont.getTitle() : "none");
-        json.addProperty("dataset_description", this.ont.getDescription() != null ? this.ont.getDescription() : "none");
+        json.addProperty("dataset_title", this.rdFmodel.getTitle() != null ? this.rdFmodel.getTitle() : "none");
+        json.addProperty("dataset_description", this.rdFmodel.getDescription() != null ? this.rdFmodel.getDescription() : "none");
 
         // Convert arrays directly to JsonArray, assuming getCheck1(), etc., return String[] or Collection<String>
-        json.add("dataset_checks1", this.ont.getCheck1() != null ? new Gson().toJsonTree(this.ont.getCheck1()) : new JsonArray());
-        json.add("dataset_checks2", this.ont.getCheck2() != null ? new Gson().toJsonTree(this.ont.getCheck2()) : new JsonArray());
-        json.add("dataset_checks3", this.ont.getCheck3() != null ? new Gson().toJsonTree(this.ont.getCheck3()) : new JsonArray());
         json.add("dataset_namespaces", this.getNamespaceStrings() != null ? new Gson().toJsonTree(this.getNamespaceStrings()) : new JsonArray());
         json.add("dataset_unavailable_namespaces", this.undownloadableNamespaces() != null ? new Gson().toJsonTree(this.undownloadableNamespaces()) : new JsonArray());
-
+        JsonArray ethicsTests = new JsonArray();
+        for (Results r : this.rdFmodel.results){
+            ethicsTests.add(this.rdFmodel.test_JSON(r));
+        }
+        json.add("dataset_ethics_tests", ethicsTests);
         // For ontologies_tested, assuming each Ontology object has a method to convert itself to a JsonObject
         JsonArray namespacesTested = new JsonArray();
         for (Namespace ns : this.namespaces) {
@@ -115,14 +106,14 @@ public class Dataset {
 
     // Getters and setters
     private void link_Namespace_Ontology(){
-        for (Ontology ontology : ontologies){
-            String ont_uri = ontology.getUri();
+        for (RDFmodel RDFmodel : ontologies){
+            String ont_uri = RDFmodel.getUri();
             String ont_uri_sub = ont_uri.substring(5);
            for(Namespace ns :namespaces){
                String ns_string = ns.getNs();
                 if(ns_string.contains(ont_uri_sub)){
                     // Link ontology to namespace
-                    ns.setOntology(ontology);
+                    ns.setOntology(RDFmodel);
                     ns.setModel_loaded("true");
                     break;
                 }
@@ -131,12 +122,12 @@ public class Dataset {
     }
 
 
-    public Ontology[] getOntologies() {
+    public RDFmodel[] getOntologies() {
         return ontologies;
     }
 
-    public Ontology getOnt() {
-        return ont;
+    public RDFmodel getRdFmodel() {
+        return rdFmodel;
     }
     public String getFileName(){ return fileName; }
 

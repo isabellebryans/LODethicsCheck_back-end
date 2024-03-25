@@ -1,7 +1,6 @@
 package Utilities;
 
-import Checker.Ontology;
-import org.apache.jena.base.Sys;
+import Checker.RDFmodel;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 
@@ -9,33 +8,22 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class RunEthicalChecks {
-    static final String[] Check1 = {"child", "minor", "youth", "school",
+
+    public static final String[] Check1 = {"child", "minor", "youth", "school",
             "homeless", "elderly", "senior", "retire",
             "migrant", "refugee", "asylum seeker", "immigrant",
             "criminal", "disab", "impair", "disadvantaged"};
-    static final String[] Check2 = {"sex", "gender", "age", "ethnic", "race", "religion", "nationality", "sexual orientation"};
-    static final String[] Check3 = {"medical", "health", "psychiatric", "addiction", "treatment", "disease", "disorder",
+    public static final String[] Check2 = {"sex", "gender", "age", "ethnic", "race", "religion", "nationality", "sexual orientation"};
+    public static final String[] Check3 = {"medical", "health", "psychiatric", "addiction", "treatment", "disease", "disorder",
             "income", "debt", "credit", "poverty", "wealth", "salary","unemploy",
             "crime", "convict", "arrest", "incarcerat", "legal status","assault",
             "sexual orientation", "lgbt", "transgender",
+            "offence",
             "political", "voting", "affiliation", "activism",
             "educat"};
 
-
-    // Level 1 and 2 checks
-    public static String[] runCheck1(Ontology o){
-        return runChecks(o, Check1);
-    }
-    public static String[] runCheck2(Ontology o){
-        return runChecks(o, Check2);
-    }
-
-    public static String[] runCheck3(Ontology o){
-        return runChecks(o, Check3);
-    }
-
-    private static String[] runChecks(Ontology o, String[] terms){
-        Model m = o.getOntModel();
+    public static String[] runLevel1Checks(RDFmodel o, String[] terms){
+        Model m = o.getModel();
         ArrayList<String> terms_found = new ArrayList<>();
         for (String term : terms) {
             // Check title
@@ -66,22 +54,31 @@ public class RunEthicalChecks {
             } finally {
                 qexec.close();
             }
-        }
 
+            // Check rdfs:comment in model
+            String query_string1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+                    "SELECT * " +
+                    "WHERE{" +
+                    "?s rdfs:comment ?o." +
+                    "FILTER (CONTAINS(lcase(?o), \""+ term + "\") )" +
+                    "}";
+            Query q1 = QueryFactory.create(query_string1);
+            QueryExecution qexec1 = QueryExecutionFactory.create(q1, m);
+            try{
+                ResultSet results1 = qexec1.execSelect();
+                while (results1.hasNext()){
+                    terms_found.add(term);
+                    break;
+                }
+            } finally {
+                qexec.close();
+            }
+        }
         return terms_found.toArray(new String[0]);
     }
 
-    public static String[] level3_check1(Model m, Set<Property> properties){
-        return test_properties(m,properties, Check1);
-    }
-    public static String[] level3_check2(Model m, Set<Property> properties){
-        return test_properties(m, properties, Check2);
-    }
-    public static String[] level3_check3(Model m, Set<Property> properties){
-        return test_properties(m, properties, Check3);
-    }
 
-    private static String[] test_properties(Model m, Set<Property> properties, String[] terms){
+    public static String[] test_properties(Model m, Set<Property> properties, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
         for (String term : terms){
             for(Property p : properties){
@@ -96,16 +93,7 @@ public class RunEthicalChecks {
         return terms_found.toArray(new String[0]);
     }
 
-    public static String[] level4_check1(Model m){
-        return test_all_objects(m, Check1);
-    }
-    public static String[] level4_check2(Model m){
-        return test_all_objects(m, Check2);
-    }
-    public static String[] level4_check3(Model m){
-        return test_all_objects(m, Check3);
-    }
-    private static String[] test_all_objects(Model m, String[] terms){
+    public static String[] test_all_objects(Model m, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
         for(String term:terms){
             StmtIterator it = m.listStatements();
@@ -129,28 +117,6 @@ public class RunEthicalChecks {
         }
         return terms_found.toArray(new String[0]);
     }
-//    private static String[] test_all_objects1(Model m, String[] terms){
-//        ArrayList<String> terms_found = new ArrayList<>();
-//        for(String term : terms){
-//            String query_string =
-//                    "SELECT * " +
-//                    "WHERE{" +
-//                    "?s ?p ?o." +
-//                    "FILTER (CONTAINS(lcase(?o), \""+ term + "\") )" +
-//                    "}";
-//            Query q = QueryFactory.create(query_string);
-//            QueryExecution qexec = QueryExecutionFactory.create(q, m);
-//            try{
-//                ResultSet results = qexec.execSelect();
-//                while (results.hasNext()){
-//                    terms_found.add(term);
-//                    break;
-//                }
-//            } finally {
-//                qexec.close();
-//            }
-//        }
-//        return terms_found.toArray(new String[0]);
-//    }
+
 
 }

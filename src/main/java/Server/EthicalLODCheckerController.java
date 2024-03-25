@@ -1,7 +1,9 @@
 package Server;
 import Checker.Dataset;
+import Checker.Test;
 import Utilities.DownloadFile;
 import Utilities.LoadModel;
+import Utilities.RunEthicalChecks;
 import org.apache.jena.base.Sys;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -38,6 +40,10 @@ public class EthicalLODCheckerController {
         @PostMapping("/upload")
         public String handleFileUpload(@RequestParam("file") MultipartFile file) {
             String response;
+            Test test1 = new Test("Vulnerability Test", "all", RunEthicalChecks.Check1);
+            Test test2 = new Test("Discrimination Test", "properties", RunEthicalChecks.Check2);
+            Test test3 = new Test("Sensitivity Test", "all", RunEthicalChecks.Check3);
+            Test[] tests = {test1, test2, test3};
             // Process the file
             try {
                 // Create a temporary file in the system's temporary directory
@@ -49,7 +55,7 @@ public class EthicalLODCheckerController {
                     response = "Failed to get model from file";
                 }
                 else {
-                    Dataset dataset = new Dataset(m, file.getOriginalFilename());
+                    Dataset dataset = new Dataset(m, file.getOriginalFilename(), tests);
                     // After processing, delete file
                     Files.delete(tempFile);
                     System.out.println("Here");

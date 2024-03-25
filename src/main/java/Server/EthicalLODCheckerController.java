@@ -38,7 +38,8 @@ public class EthicalLODCheckerController {
         }
 
         @PostMapping("/upload")
-        public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+        public String handleFileUpload(@RequestParam("file") MultipartFile file,
+                                       @RequestParam("json") String json) {
             String response;
             Test test1 = new Test("Vulnerability Test", "all", RunEthicalChecks.Check1);
             Test test2 = new Test("Discrimination Test", "properties", RunEthicalChecks.Check2);

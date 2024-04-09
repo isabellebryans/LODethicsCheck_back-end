@@ -1,0 +1,13 @@
+{
+  "name": "Sensitivity Test",
+  "target": "all",
+  "terms": [
+    "medical", "health", "psychiatric", "addiction", "treatment", "disease", "disorder",
+    "income", "debt", "credit", "poverty", "wealth", "salary","unemploy",
+    "crime", "convict", "arrest", "incarcerat", "legal status","assault",
+    "sexual orientation", "lgbt", "transgender",
+    "offence",
+    "political", "voting", "affiliation", "activism",
+    "educat"
+  ]
+}

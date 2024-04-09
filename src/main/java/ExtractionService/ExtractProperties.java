@@ -1,6 +1,6 @@
-package Utilities;
+package ExtractionService;
 
-import Checker.Namespace;
+import Entities.Namespace;
 import org.apache.jena.rdf.model.*;
 
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// Extract properties from a rdf model
-public class ExtractionMethods {
+// Methods to extract properties from a rdf model
+public class ExtractProperties {
 
     public static Set<Property> extractProperties(Model model){
         // Collect unique properties

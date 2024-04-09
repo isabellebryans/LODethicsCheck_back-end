@@ -1,28 +1,18 @@
-package Utilities;
+package TestingService;
 
-import Checker.RDFmodel;
+import Entities.RDFmodel;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 
 import java.util.ArrayList;
 import java.util.Set;
 
+// Methods to apply Ethical Tests to RDF model
 public class RunEthicalChecks {
 
-    public static final String[] Check1 = {"child", "minor", "youth", "school",
-            "homeless", "elderly", "senior", "retire",
-            "migrant", "refugee", "asylum seeker", "immigrant",
-            "criminal", "disab", "impair", "disadvantaged"};
-    public static final String[] Check2 = {"sex", "gender", "age", "ethnic", "race", "religion", "nationality", "sexual orientation"};
-    public static final String[] Check3 = {"medical", "health", "psychiatric", "addiction", "treatment", "disease", "disorder",
-            "income", "debt", "credit", "poverty", "wealth", "salary","unemploy",
-            "crime", "convict", "arrest", "incarcerat", "legal status","assault",
-            "sexual orientation", "lgbt", "transgender",
-            "offence",
-            "political", "voting", "affiliation", "activism",
-            "educat"};
-
-    public static String[] runLevel1Checks(RDFmodel o, String[] terms){
+    // General test target area
+    // Tests: title, description, labels and comments
+    public static String[] general_test(RDFmodel o, String[] terms){
         Model m = o.getModel();
         ArrayList<String> terms_found = new ArrayList<>();
         for (String term : terms) {
@@ -77,8 +67,8 @@ public class RunEthicalChecks {
         return terms_found.toArray(new String[0]);
     }
 
-
-    public static String[] test_properties(Model m, Set<Property> properties, String[] terms){
+    // Tests all predicates in the model
+    public static String[] test_predicates(Model m, Set<Property> properties, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
         for (String term : terms){
             for(Property p : properties){
@@ -93,7 +83,8 @@ public class RunEthicalChecks {
         return terms_found.toArray(new String[0]);
     }
 
-    public static String[] test_all_objects(Model m, String[] terms){
+    // Test all objects in the model
+    public static String[] test_objects(Model m, String[] terms){
         ArrayList<String> terms_found = new ArrayList<>();
         for(String term:terms){
             StmtIterator it = m.listStatements();

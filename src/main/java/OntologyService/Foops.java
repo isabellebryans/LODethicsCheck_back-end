@@ -1,9 +1,8 @@
-package Checker;
+package OntologyService;
 
-import com.google.gson.JsonElement;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import Utilities.FoopsCheck;
+import OntologyService.FoopsCheck;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+
+// Stores the FOOPS results for each ontology
 public class Foops {
     final String URI;
     private String ontology_title;
@@ -28,7 +29,6 @@ public class Foops {
     }
 
     private void send_http_request() throws IOException {
-        // URL and JSON payload
         String url = "https://foops.linkeddata.es/assessOntology";
         String jsonPayload = "{\"ontologyUri\":\"" + URI + "\"}";
 
@@ -67,7 +67,7 @@ public class Foops {
         this.results = jsonObject;
         this.ontology_title = jsonObject.getString("ontology_title");
         this.overall_score = jsonObject.getDouble("overall_score");
-        // Parsing checks array
+        // Parse checks array
         JSONArray checksArray = jsonObject.getJSONArray("checks");
         List<FoopsCheck> checks1 = new ArrayList<FoopsCheck>();
         for (int i = 0; i < checksArray.length(); i++) {

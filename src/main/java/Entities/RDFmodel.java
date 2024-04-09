@@ -1,7 +1,8 @@
-package Checker;
+package Entities;
 
-import Utilities.ExtractMetadata;
-import Utilities.RunEthicalChecks;
+import ExtractionService.ExtractMetadata;
+import OntologyService.Foops;
+import TestingService.RunEthicalChecks;
 import com.google.gson.Gson;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -15,14 +16,11 @@ public class RDFmodel {
     Model model;
     Foops foopsResult=null;
     String uri;
-    // Metadata
     String description=null;
     String title=null;
-    int metaDataScore=0;
 
     Test[] tests;
     Results[] results;
-    // Check1 = check for the presence of vulnerable groups/people
 
     public RDFmodel(Model m, String uri){
         this.model = m;
@@ -32,7 +30,7 @@ public class RDFmodel {
         printMetadata();
     }
 
-
+    // Run FOOPS on ontology
     public void runFOOPS() {
         try{
             this.foopsResult = new Foops(this.uri);
@@ -45,22 +43,18 @@ public class RDFmodel {
         }
     }
 
-    public void setTests(Test[] tests) {
-        this.tests = tests;
-    }
-
     public void runTestsDataset(Set<Property> properties){
         ArrayList<Results> results1 = new ArrayList<>();
         for (Test t : this.tests){
             Results results2 = new Results(t);
-            String[] level1 = RunEthicalChecks.runLevel1Checks(this, t.getTest_terms());
+            String[] level1 = RunEthicalChecks.general_test(this, t.getTest_terms());
             results2.setResults(Arrays.asList(level1));
             if(!t.getTest_places().equals("objects")){
-                String[] level2 = RunEthicalChecks.test_properties(this.model, properties, t.getTest_terms());
+                String[] level2 = RunEthicalChecks.test_predicates(this.model, properties, t.getTest_terms());
                 results2.setResults(Arrays.asList(level2));
             }
             if(!t.getTest_places().equals("properties")){
-                String[] level3 = RunEthicalChecks.test_all_objects(this.model, t.getTest_terms());
+                String[] level3 = RunEthicalChecks.test_objects(this.model, t.getTest_terms());
                 results2.setResults(Arrays.asList(level3));
             }
             results1.add(results2);
@@ -72,7 +66,7 @@ public class RDFmodel {
     public void runTestsOntology(){
         ArrayList<Results> results1 = new ArrayList<>();
         for (Test t : this.tests){
-            String[] level1 = RunEthicalChecks.runLevel1Checks(this, t.getTest_terms());
+            String[] level1 = RunEthicalChecks.general_test(this, t.getTest_terms());
 
             Results results2 = new Results(t);
             results2.setResults(Arrays.asList(level1));
@@ -81,17 +75,12 @@ public class RDFmodel {
         this.results = results1.toArray(new Results[0]);
     }
 
+    // Create JSON of results
     public JsonObject get_ont_JSON() {
         JsonObject json = new JsonObject();
-        // Directly add properties to the JsonObject
-        //json.addProperty("ontology_uri", this.uri);
         json.addProperty("ontology_title", this.title != null ? this.title : "none");
         json.addProperty("ontology_description", this.description != null ? this.description : "none");
 
-        // Assuming Check1, Check2, Check3 are arrays or collections of strings
-        // Convert them directly to JsonArrays using Gson's toJsonTree method
-        // This assumes Check1, Check2, Check3, etc. are String[] or similar;
-        // if they're not, you'll need to adjust this accordingly.
         JsonArray EthicalTests = new JsonArray();
         int i=0;
         for (Results r : results){
@@ -104,6 +93,7 @@ public class RDFmodel {
         return json;
     }
 
+    // Create JSON object for one test
     public JsonObject test_JSON(Results r){
         JsonObject json = new JsonObject();
         json.addProperty("test_name", r.getTest().getName());
@@ -126,6 +116,9 @@ public class RDFmodel {
 
     public String getTitle() {
         return title;
+    }
+    public void setTests(Test[] tests) {
+        this.tests = tests;
     }
 
     public Model getModel() {

@@ -1,4 +1,4 @@
-package Checker;
+package Entities;
 
 public class Test {
     private final String name;

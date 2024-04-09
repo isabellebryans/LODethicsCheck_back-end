@@ -1,0 +1,7 @@
+{
+  "name": "Discrimination Test",
+  "target": "properties",
+  "terms": [
+    "sex", "gender", "age", "ethnic", "race", "religion", "nationality", "sexual orientation"
+  ]
+}

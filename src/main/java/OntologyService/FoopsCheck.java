@@ -1,4 +1,4 @@
-package Utilities;
+package OntologyService;
 
 // FOOPS Check class for FOOPS response
 public class FoopsCheck {

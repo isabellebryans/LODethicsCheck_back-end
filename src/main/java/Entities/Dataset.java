@@ -1,6 +1,9 @@
-package Checker;
+package Entities;
 
-import Utilities.*;
+import ExtractionService.ExtractProperties;
+import OntologyService.DownloadFile;
+import OntologyService.LoadModel;
+import Utils.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -15,7 +18,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Dataset {
-    private List<Namespace> ontsUnavailable= new ArrayList<>();
     private final RDFmodel rdFmodel;
     private Set<Property> properties;
     private final List<Namespace> namespaces;
@@ -29,40 +31,37 @@ public class Dataset {
         this.tests = tests;
         this.rdFmodel = new RDFmodel(model1, "");
         this.rdFmodel.setTests(tests);
-        this.properties = ExtractionMethods.extractProperties(model1);
+        // Extract properties and namespaces
+        this.properties = ExtractProperties.extractProperties(model1);
+        this.namespaces = ExtractProperties.extractNamespaces(properties, model1);
+        // Run ethical tests at dataset level
         this.rdFmodel.runTestsDataset(this.properties);
-        this.namespaces = ExtractionMethods.extractNamespaces(properties, model1);
+        // Download Ontologies
         Path ontologiesFolder = downloadOntologies();
         this.ontologies = LoadModel.loadOntologiesFromFolder(ontologiesFolder);
         DownloadFile.removeTemporaryFolders(ontologiesFolder);
-        printNamespaces();
+        // Run ethical tests on ontologies
         testOntologies();
         link_Namespace_Ontology();
     }
 
+    // Run ethical tests on the ontologies
+    // Test ontologies with foops
     private void testOntologies(){
         for (RDFmodel o : this.ontologies){
             o.setTests(this.tests);
-        // runn foops
             o.runFOOPS();
             o.runTestsOntology();
         }
     }
 
-    private void printNamespaces(){
-        System.out.println("Namespaces: ");
-        for(Namespace ns : namespaces){
-            System.out.println(ns.getNs()+" "+ns.isDownloadable());
-            }
-    }
-
+    // Create JSON object for response
     public String export_JSON(){
         JsonObject json = new JsonObject();
         json.addProperty("file_name", this.fileName);
         json.addProperty("dataset_title", this.rdFmodel.getTitle() != null ? this.rdFmodel.getTitle() : "none");
         json.addProperty("dataset_description", this.rdFmodel.getDescription() != null ? this.rdFmodel.getDescription() : "none");
 
-        // Convert arrays directly to JsonArray, assuming getCheck1(), etc., return String[] or Collection<String>
         json.add("dataset_namespaces", this.getNamespaceStrings() != null ? new Gson().toJsonTree(this.getNamespaceStrings()) : new JsonArray());
         json.add("dataset_unavailable_namespaces", this.undownloadableNamespaces() != null ? new Gson().toJsonTree(this.undownloadableNamespaces()) : new JsonArray());
         JsonArray ethicsTests = new JsonArray();
@@ -70,11 +69,8 @@ public class Dataset {
             ethicsTests.add(this.rdFmodel.test_JSON(r));
         }
         json.add("dataset_ethics_tests", ethicsTests);
-        // For ontologies_tested, assuming each Ontology object has a method to convert itself to a JsonObject
         JsonArray namespacesTested = new JsonArray();
         for (Namespace ns : this.namespaces) {
-            // Here, it's assumed Ontology has a method to return its representation as a JsonObject.
-            // If not, you would construct this JsonObject similarly to above.
             namespacesTested.add(ns.getJSON());
         }
         json.add("namespaces_tested", namespacesTested);
@@ -85,11 +81,12 @@ public class Dataset {
     }
 
 
+    // Attempt to download each ontology
     private Path downloadOntologies() {
         Path folder = DownloadFile.createTempFolder();
         System.out.println("Temp folder created is "+folder.toString());
         for (Namespace namespace : namespaces){
-            if (Utils.ArrayContains(DownloadFile.common_vocabs, namespace.getNs())){
+            if (other.ArrayContains(DownloadFile.common_vocabs, namespace.getNs())){
                 namespace.setDownloadable(true);
                 namespace.setModel_loaded("standard");
                 continue;
@@ -104,7 +101,7 @@ public class Dataset {
         return folder;
     }
 
-    // Getters and setters
+    // Link ontology models to the namespace
     private void link_Namespace_Ontology(){
         for (RDFmodel RDFmodel : ontologies){
             String ont_uri = RDFmodel.getUri();

@@ -1,6 +1,6 @@
-package Utilities;
+package OntologyService;
 
-import Checker.RDFmodel;
+import Entities.RDFmodel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+// Methods to load ontologies from folder
 public class LoadModel {
     public static RDFmodel[] loadOntologiesFromFolder(Path folder) throws IOException {
         // Create a File object for the temporary folder
@@ -26,7 +27,6 @@ public class LoadModel {
             System.out.println("Temp folder is a directory");
             // Iterate through each file
             for (File file : files) {
-                // Check if it's a file (not a directory)
                 if (file.isFile()) {
                     try  {
                         String uri = LoadModel.getURIfromFile(file);
@@ -98,9 +98,7 @@ public class LoadModel {
         // Turn file into input stream to be read
         try {
             InputStream dataModelIS = new FileInputStream(newFile);
-            // Create empty RDF model
             Model dataModel = ModelFactory.createDefaultModel();
-            // From RDF io lib (riot), Read input stream into new model
             RDFDataMgr.read(dataModel, dataModelIS, lang);
             return dataModel;
         } catch(Exception e){
@@ -109,15 +107,4 @@ public class LoadModel {
         return null;
     }
 
-    public static Model initAndLoadModelFromResource(String filename, Lang lang) throws IOException {
-        // Turn file into input stream to be read
-        File newFile = new File(filename);
-        InputStream dataModelIS = LoadModel.class.getClassLoader().getResourceAsStream(filename);
-        //InputStream dataModelIS = new FileInputStream(newFile);
-        // Create empty RDF model
-        Model dataModel = ModelFactory.createDefaultModel();
-        // From RDF io lib (riot), Read input stream into new model
-        RDFDataMgr.read(dataModel, dataModelIS, lang);
-        return dataModel;
-    }
 }

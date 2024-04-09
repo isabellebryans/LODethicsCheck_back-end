@@ -1,10 +1,10 @@
-package Utilities;
+package ExtractionService;
 
-import org.apache.jena.base.Sys;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.*;
 
+// Methods to extract title and description from RDF model
 public class ExtractMetadata {
     private static final String datasetQueryString = "PREFIX dq: <http://purl.org/linked-data/cube#>" +
             "PREFIX void: <http://rdfs.org/ns/void#>" +
@@ -99,15 +99,15 @@ public class ExtractMetadata {
     private static RDFNode getdataset(Model m){
         Query q = QueryFactory.create(datasetQueryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(q, m)) {
-            ResultSet results = qexec.execSelect(); // Execute the query and get the results
+            ResultSet results = qexec.execSelect();
             if (results.hasNext()) { // Check if there's at least one result
                 QuerySolution solution = results.nextSolution(); // Get the next solution
                 RDFNode subject = solution.get("s"); // Get the resource bound to ?subject
-                System.out.println(subject); // Print out the resource (for debugging purposes)
-                return subject; // Return the found resource
+                System.out.println(subject);
+                return subject;
             } else {
                 //System.out.println("No dataset found.");
-                return null; // Return null if no dataset is found
+                return null;
             }
         }
     }

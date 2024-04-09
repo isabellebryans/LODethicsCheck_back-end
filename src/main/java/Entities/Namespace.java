@@ -1,8 +1,10 @@
-package Checker;
+package Entities;
 
+import OntologyService.Foops;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+
 
 public class Namespace {
     String ns;
@@ -46,12 +48,7 @@ public class Namespace {
         // Convert the JSONObject to a String
         if (this.foops != null) {
             json.addProperty("ns_foops_overall_score", this.foops.getOverall_score());
-//            String resultsString = this.foops.getResults().toString();
-//            JsonObject convertedJsonObject = JsonParser.parseString(resultsString).getAsJsonObject();
-//            json.add("ns_foops_results", convertedJsonObject);
         } else {
-            // Assuming you still want to indicate 'none' or similar if there's no score.
-            // If not having a score should simply omit the property, you can adjust this logic.
             json.addProperty("ns_foops_results", "none");
         }
         if (this.RDFmodel != null) {

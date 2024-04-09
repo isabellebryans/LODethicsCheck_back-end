@@ -1,4 +1,4 @@
-package Utilities;
+package OntologyService;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -10,6 +10,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/// Functions to download ontologies for Ontology Service
 public class DownloadFile {
     private static int number;
     private static final Logger logger = LoggerFactory.getLogger(DownloadFile.class);
@@ -66,8 +67,7 @@ public class DownloadFile {
         InputStream inputStream = conn.getInputStream();
 
         try (FileOutputStream outputStream = new FileOutputStream(savePath)) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
+
             outputStream.write(firstLine.getBytes());
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;

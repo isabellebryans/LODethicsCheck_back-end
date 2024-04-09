@@ -12,7 +12,7 @@
 	<artifactId>EthicalLODCheckerServer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>EthicalLODCheckerServer</name>
-	<description>Server for Ethical LOD Checker</description>
+	<description>Server for Ethical LOD Entities</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>
